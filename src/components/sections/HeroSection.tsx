@@ -70,6 +70,7 @@ export function HeroSection() {
             <Button 
               size="lg" 
               className="bg-aurora text-primary-foreground font-display text-lg px-8 py-6 glow-primary hover:opacity-90 transition-all duration-300 group"
+              onClick={() => window.location.href = '/world'}
             >
               Explorar Metaverso
               <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />

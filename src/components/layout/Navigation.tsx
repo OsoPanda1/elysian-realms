@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Globe, User, ShoppingBag, Gamepad2, Sparkles } from 'lucide-react';
+import { Menu, X, Globe, ShoppingBag, Gamepad2, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { UserMenu } from './UserMenu';
 
 const navItems = [
   { label: 'Mundo XR', icon: Globe, href: '#mundo' },
@@ -50,13 +51,7 @@ export function Navigation() {
 
           {/* CTA Buttons */}
           <div className="hidden md:flex items-center gap-3">
-            <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
-              <User className="w-4 h-4 mr-2" />
-              Iniciar Sesión
-            </Button>
-            <Button className="bg-aurora text-primary-foreground font-display glow-primary hover:opacity-90 transition-opacity">
-              Entrar al Metaverso
-            </Button>
+            <UserMenu />
           </div>
 
           {/* Mobile Menu Button */}
@@ -94,13 +89,7 @@ export function Navigation() {
                 </motion.a>
               ))}
               <div className="pt-4 border-t border-primary/10 space-y-2">
-                <Button variant="ghost" className="w-full justify-start">
-                  <User className="w-4 h-4 mr-2" />
-                  Iniciar Sesión
-                </Button>
-                <Button className="w-full bg-aurora text-primary-foreground font-display">
-                  Entrar al Metaverso
-                </Button>
+                <UserMenu />
               </div>
             </div>
           </motion.div>

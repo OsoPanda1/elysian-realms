@@ -1,6 +1,6 @@
 import { Suspense, useState, useRef, useEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { OrbitControls, Environment, Stars, PointerLockControls, Sky } from '@react-three/drei';
+import { OrbitControls, Stars, PointerLockControls } from '@react-three/drei';
 import * as THREE from 'three';
 import { PlazaMayor } from './PlazaMayor';
 import { TemploMSR } from './TemploMSR';
@@ -8,8 +8,8 @@ import { SantuarioIsabella } from './SantuarioIsabella';
 import { TianguisEconomico } from './TianguisEconomico';
 import { MurallasGuardianes } from './MurallasGuardianes';
 
-// District types
-type District = 'plaza' | 'templo' | 'santuario' | 'tianguis' | 'murallas';
+// District types - exported for use in other components
+export type District = 'plaza' | 'templo' | 'santuario' | 'tianguis' | 'murallas';
 
 // First Person Controls with WASD
 function FirstPersonCamera({ enabled }: { enabled: boolean }) {

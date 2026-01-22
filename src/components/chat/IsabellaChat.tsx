@@ -1,14 +1,13 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Bot, Send, X, Minimize2, Maximize2, Sparkles, 
-  MessageCircle, Loader2, AlertCircle 
+  Bot, Send, X, Minimize2, Maximize2, 
+  Loader2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 interface Message {
@@ -22,10 +21,11 @@ const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/isabella-cha
 
 interface IsabellaChatProps {
   onClose?: () => void;
+  embedded?: boolean;
 }
 
-export function IsabellaChat({ onClose }: IsabellaChatProps = {}) {
-  const [isOpen, setIsOpen] = useState(false);
+export function IsabellaChat({ onClose, embedded = false }: IsabellaChatProps) {
+  const [isOpen, setIsOpen] = useState(embedded);
   const [isMinimized, setIsMinimized] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -38,7 +38,7 @@ export function IsabellaChat({ onClose }: IsabellaChatProps = {}) {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   
-  const { user, profile } = useAuth();
+  const { user } = useAuth();
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -51,10 +51,10 @@ export function IsabellaChat({ onClose }: IsabellaChatProps = {}) {
 
   // Focus input when chat opens
   useEffect(() => {
-    if (isOpen && !isMinimized && inputRef.current) {
+    if ((isOpen || embedded) && !isMinimized && inputRef.current) {
       inputRef.current.focus();
     }
-  }, [isOpen, isMinimized]);
+  }, [isOpen, isMinimized, embedded]);
 
   const streamChat = useCallback(async (userMessage: string) => {
     setIsLoading(true);
@@ -204,7 +204,13 @@ export function IsabellaChat({ onClose }: IsabellaChatProps = {}) {
     streamChat(message);
   };
 
-  if (!isOpen) {
+  const handleClose = () => {
+    setIsOpen(false);
+    onClose?.();
+  };
+
+  // Floating button mode (not embedded)
+  if (!embedded && !isOpen) {
     return (
       <motion.button
         initial={{ scale: 0 }}
@@ -220,17 +226,20 @@ export function IsabellaChat({ onClose }: IsabellaChatProps = {}) {
     );
   }
 
-  return (
+  // Chat panel
+  const chatContent = (
     <motion.div
       initial={{ opacity: 0, y: 100, scale: 0.9 }}
       animate={{ 
         opacity: 1, 
         y: 0, 
         scale: 1,
-        height: isMinimized ? 'auto' : '500px',
+        height: isMinimized ? 'auto' : embedded ? '100%' : '500px',
       }}
       exit={{ opacity: 0, y: 100, scale: 0.9 }}
-      className="fixed bottom-6 right-6 z-50 w-[380px] max-w-[calc(100vw-3rem)] glass-strong rounded-2xl border-glow overflow-hidden flex flex-col"
+      className={`glass-strong rounded-2xl border-glow overflow-hidden flex flex-col ${
+        embedded ? 'w-full h-full' : 'fixed bottom-6 right-6 z-50 w-[380px] max-w-[calc(100vw-3rem)]'
+      }`}
     >
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-primary/10">
@@ -259,10 +268,7 @@ export function IsabellaChat({ onClose }: IsabellaChatProps = {}) {
             variant="ghost"
             size="icon"
             className="h-8 w-8"
-            onClick={() => {
-              setIsOpen(false);
-              onClose?.();
-            }}
+            onClick={handleClose}
           >
             <X className="w-4 h-4" />
           </Button>
@@ -337,4 +343,6 @@ export function IsabellaChat({ onClose }: IsabellaChatProps = {}) {
       </AnimatePresence>
     </motion.div>
   );
+
+  return embedded ? chatContent : <AnimatePresence>{isOpen && chatContent}</AnimatePresence>;
 }

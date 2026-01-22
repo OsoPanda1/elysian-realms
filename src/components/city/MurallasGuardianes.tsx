@@ -64,7 +64,7 @@ function AnubisWall({ position, rotation }: { position: [number, number, number]
 
 // Horus Eye Tower
 function HorusEyeTower({ position }: { position: [number, number, number] }) {
-  const eyeRef = useRef<THREE.Mesh>(null);
+  const eyeRef = useRef<THREE.Group>(null);
   const beamRef = useRef<THREE.Mesh>(null);
 
   useFrame((state) => {

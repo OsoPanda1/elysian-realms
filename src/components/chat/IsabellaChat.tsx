@@ -20,7 +20,11 @@ interface Message {
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/isabella-chat`;
 
-export function IsabellaChat() {
+interface IsabellaChatProps {
+  onClose?: () => void;
+}
+
+export function IsabellaChat({ onClose }: IsabellaChatProps = {}) {
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
@@ -255,7 +259,10 @@ export function IsabellaChat() {
             variant="ghost"
             size="icon"
             className="h-8 w-8"
-            onClick={() => setIsOpen(false)}
+            onClick={() => {
+              setIsOpen(false);
+              onClose?.();
+            }}
           >
             <X className="w-4 h-4" />
           </Button>

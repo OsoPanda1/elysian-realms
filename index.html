@@ -1,26 +1,342 @@
 <!doctype html>
-<html lang="en">
+<html lang="es">
   <head>
+    <!-- =========================================
+         Núcleo documento y compatibilidad
+    ========================================== -->
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- TODO: Set the document title to the name of your application -->
-    <title>Lovable App</title>
-    <meta name="description" content="Lovable Generated Project" />
-    <meta name="author" content="Lovable" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
-    <!-- TODO: Update og:title to match your application name -->
-    <meta property="og:title" content="Lovable App" />
-    <meta property="og:description" content="Lovable Generated Project" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#020617" />
+
+    <!-- =========================================
+         Identidad TAMV · Meta principal
+    ========================================== -->
+    <title>
+      TAMV ONLINE · Infraestructura Civilizatoria Web4·Web5 desde Latinoamérica
+    </title>
+
+    <meta
+      name="description"
+      content="TAMV ONLINE es una infraestructura civilizatoria Web4·Web5 nacida en Latinoamérica: IA soberana (Isabella), seguridad post‑cuántica, metaverso XR‑first y federación ética anclada a México."
+    />
+
+    <meta
+      name="author"
+      content="Edwin Oswaldo Castillo Trejo · Anubis Villaseñor"
+    />
+
+    <meta
+      name="keywords"
+      content="TAMV, Web4, Web5, infraestructura civilizatoria, IA soberana, Isabella AI, blockchain ético, metaverso latinoamericano, Real del Monte, México, soberanía digital, federación de nodos, XR, guardianías, BookPI, MSR"
+    />
+
+    <meta name="robots" content="index,follow" />
+    <link rel="canonical" href="https://tamv.online" />
+
+    <!-- =========================================
+         Open Graph · Redes y compartido
+    ========================================== -->
+    <meta
+      property="og:title"
+      content="TAMV ONLINE · Infraestructura Civilizatoria Web4·Web5 desde Latinoamérica"
+    />
+    <meta
+      property="og:description"
+      content="Ecosistema digital soberano con IA ética (Isabella Kernel), seguridad post‑cuántica Dekateotl y 7 federados civilizatorios desde Real del Monte, Hidalgo, México."
+    />
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+    <meta
+      property="og:image"
+      content="https://lovable.dev/opengraph-image-p98pqg.png"
+    />
+    <meta property="og:url" content="https://tamv.online" />
+    <meta property="og:site_name" content="TAMV ONLINE" />
+    <meta property="og:locale" content="es_MX" />
 
+    <!-- =========================================
+         Twitter / X
+    ========================================== -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@Lovable" />
-    <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+    <meta
+      name="twitter:title"
+      content="TAMV ONLINE · Infraestructura Civilizatoria Web4·Web5 desde Latinoamérica"
+    />
+    <meta
+      name="twitter:description"
+      content="Plataforma pionera que combina IA soberana, metaverso XR‑first y trazabilidad ética en 7 federados civilizatorios."
+    />
+    <meta
+      name="twitter:image"
+      content="https://lovable.dev/opengraph-image-p98pqg.png"
+    />
+    <meta name="twitter:site" content="@tamv_online" />
+    <meta name="twitter:creator" content="@tamv_online" />
+
+    <!-- =========================================
+         PWA · App feeling
+    ========================================== -->
+    <meta name="application-name" content="TAMV ONLINE" />
+    <meta name="apple-mobile-web-app-title" content="TAMV ONLINE" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+
+    <!-- =========================================
+         Tipografía y tono visual 2026
+    ========================================== -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- =========================================
+         Metadatos de contexto TAMV
+    ========================================== -->
+    <meta name="tamv:origin" content="Real del Monte, Hidalgo, México" />
+    <meta
+      name="tamv:stack"
+      content="Isabella Kernel · Dekateotl Security · BookPI · MSR Blockchain · MD‑X4 Federation"
+    />
+    <meta
+      name="tamv:statement"
+      content="Somos TAMV: elegantes, sofisticados, somos futuro. Infraestructura civilizatoria para una nueva era digital."
+    />
+
+    <!-- =========================================
+         Estilos base · Intro XR TAMV
+    ========================================== -->
+    <style>
+      :root {
+        color-scheme: dark;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background-color: #020617;
+        color: #e5e7eb;
+        font-family: "Space Grotesk", system-ui, -apple-system,
+          BlinkMacSystemFont, "Segoe UI", sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* Intro obsidiana TAMV (pre-React) */
+      .tamv-intro {
+        position: fixed;
+        inset: 0;
+        background: #000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        z-index: 9999;
+      }
+
+      .tamv-intro__matrix {
+        position: absolute;
+        inset: 0;
+        opacity: 0.35;
+        pointer-events: none;
+      }
+
+      .tamv-intro__core {
+        position: relative;
+        z-index: 2;
+        text-align: center;
+        max-width: 420px;
+        padding: 1.5rem;
+      }
+
+      .tamv-intro__logo {
+        width: 96px;
+        height: 96px;
+        margin: 0 auto 1rem;
+        border-radius: 999px;
+        border: 1px solid rgba(56, 189, 248, 0.65);
+        box-shadow:
+          0 0 30px rgba(8, 47, 73, 0.9),
+          0 0 80px rgba(56, 189, 248, 0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.3rem;
+        letter-spacing: 0.28em;
+        text-transform: uppercase;
+        color: #e5e7eb;
+        background: radial-gradient(circle at 30% 0%, #0f172a, #020617 70%);
+      }
+
+      .tamv-intro__title {
+        font-weight: 700;
+        font-size: 1rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: #38bdf8;
+      }
+
+      .tamv-intro__subtitle {
+        margin-top: 0.5rem;
+        font-size: 0.8rem;
+        line-height: 1.5;
+        color: #9ca3af;
+      }
+
+      .tamv-intro__tagline {
+        margin-top: 0.75rem;
+        font-size: 0.8rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: #fbbf24;
+      }
+
+      .tamv-intro__pulse {
+        position: absolute;
+        width: 260px;
+        height: 260px;
+        border-radius: 999px;
+        border: 1px solid rgba(96, 165, 250, 0.35);
+        filter: blur(10px);
+        box-shadow:
+          0 0 60px rgba(30, 64, 175, 0.8),
+          0 0 150px rgba(59, 130, 246, 0.6);
+      }
+
+      .tamv-intro__skip {
+        position: absolute;
+        bottom: 1.5rem;
+        right: 1.5rem;
+        font-size: 0.75rem;
+        color: #6b7280;
+        cursor: pointer;
+        user-select: none;
+      }
+
+      .tamv-intro__skip:hover {
+        color: #e5e7eb;
+      }
+    </style>
   </head>
 
-  <body>
+  <body class="bg-slate-950 text-slate-50 antialiased">
+    <!-- =========================================
+         Intro TAMV · Obsidiana + Matrix + Voz Anubis
+         (React luego monta su propia intro XR dentro)
+    ========================================== -->
+    <div id="tamv-intro" class="tamv-intro">
+      <!-- Canvas opcional para lluvia de código / efectos -->
+      <canvas id="tamv-matrix" class="tamv-intro__matrix"></canvas>
+
+      <div class="tamv-intro__core">
+        <div class="tamv-intro__logo">
+          <span>T</span>
+        </div>
+        <div class="tamv-intro__title">TAMV ONLINE</div>
+        <div class="tamv-intro__subtitle">
+          Infraestructura civilizatoria Web4·Web5 desde Latinoamérica:
+          IA soberana, metaverso XR‑first y seguridad post‑cuántica
+          al servicio de tu futuro digital.
+        </div>
+        <div class="tamv-intro__tagline">
+          SOMOS TAMV · ELEGANTES · SOFISTICADOS · SOMOS FUTURO
+        </div>
+      </div>
+
+      <div class="tamv-intro__pulse"></div>
+
+      <div id="tamv-intro-skip" class="tamv-intro__skip">
+        Saltar introducción ⏭
+      </div>
+
+      <!-- Audio de bienvenida (voz Anubis / IA) -->
+      <audio id="tamv-intro-voice" preload="auto">
+        <!-- Asigna el src desde tu backend o TTS:
+             “Yo soy Anubis Villaseñor, y te doy la bienvenida a mi mundo digital.
+              Te estaba esperando. Ya formas parte de la élite.” -->
+      </audio>
+    </div>
+
+    <!-- =========================================
+         Núcleo React / XR App
+    ========================================== -->
     <div id="root"></div>
+
     <script type="module" src="/src/main.tsx"></script>
+
+    <script>
+      // Intro HTML de arranque: se mostrará sólo la primera vez
+      (function () {
+        var intro = document.getElementById("tamv-intro");
+        var skip = document.getElementById("tamv-intro-skip");
+        var voice = document.getElementById("tamv-intro-voice");
+
+        var INTRO_KEY = "tamv_intro_seen";
+        var INTRO_DURATION = 8000; // 8s aprox.
+
+        function hasSeenIntro() {
+          try {
+            return window.localStorage.getItem(INTRO_KEY) === "true";
+          } catch (e) {
+            return false;
+          }
+        }
+
+        function markIntroSeen() {
+          try {
+            window.localStorage.setItem(INTRO_KEY, "true");
+          } catch (e) {}
+        }
+
+        function closeIntro() {
+          if (!intro) return;
+          intro.style.transition = "opacity 600ms ease";
+          intro.style.opacity = "0";
+          setTimeout(function () {
+            intro.style.display = "none";
+          }, 650);
+          if (voice && !voice.paused) {
+            voice.pause();
+          }
+          markIntroSeen();
+        }
+
+        function playVoice() {
+          if (!voice) return;
+          // Asigna src dinámicamente si lo necesitas:
+          // voice.src = "/audio/anubis-intro.mp3";
+          voice
+            .play()
+            .then(function () {})
+            .catch(function () {
+              // Autoplay bloqueado; solo intro visual
+            });
+        }
+
+        if (hasSeenIntro()) {
+          // Si ya vio el ritual, ocultar de inmediato
+          if (intro) intro.style.display = "none";
+        } else {
+          // Mostrar intro y reproducir voz si es posible
+          playVoice();
+          setTimeout(closeIntro, INTRO_DURATION);
+        }
+
+        if (skip) {
+          skip.addEventListener("click", closeIntro);
+        }
+      })();
+    </script>
   </body>
 </html>

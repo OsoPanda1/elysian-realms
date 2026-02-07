@@ -1,5 +1,5 @@
 // src/lib/economy/tauCredits.ts
-import { supabase } from '@/lib/supabaseClient';
+import { supabase } from '@/integrations/supabase/client';
 
 export type TauTransactionType = 'MISSION_REWARD' | 'MARKETPLACE_PURCHASE' | 'TRANSFER';
 
@@ -7,14 +7,22 @@ export interface TauWallet {
   id: string;
   user_id: string;
   balance: number;
+  locked_balance: number;
+  total_earned: number;
+  total_spent: number;
   updated_at: string;
 }
 
 export interface TauTransaction {
   id: string;
-  wallet_id: string;
-  type: TauTransactionType;
+  from_user_id: string | null;
+  to_user_id: string | null;
   amount: number;
+  transaction_type: string;
+  description: string | null;
+  fenix_share: number | null;
+  infra_share: number | null;
+  reserve_share: number | null;
   created_at: string;
   metadata: Record<string, unknown> | null;
 }
@@ -22,9 +30,11 @@ export interface TauTransaction {
 export interface TauMission {
   id: string;
   title: string;
-  description: string;
-  reward_amount: number;
-  status: 'ACTIVE' | 'INACTIVE';
+  description: string | null;
+  tau_reward: number | null;
+  xp_reward: number;
+  is_active: boolean;
+  mission_type: string;
 }
 
 export async function getWallet(): Promise<TauWallet | null> {
@@ -43,63 +53,66 @@ export async function getWallet(): Promise<TauWallet | null> {
     .eq('user_id', user.id)
     .single();
 
-  if (error) {
-    throw error;
-  }
-
-  return data as TauWallet;
+  if (error) throw error;
+  return data as unknown as TauWallet;
 }
 
 export async function getTransactions(limit = 50): Promise<TauTransaction[]> {
-  const wallet = await getWallet();
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
 
-  if (!wallet) {
-    return [];
-  }
+  if (userError || !user) return [];
 
   const { data, error } = await supabase
     .from('transactions')
     .select('*')
-    .eq('wallet_id', wallet.id)
+    .or(`from_user_id.eq.${user.id},to_user_id.eq.${user.id}`)
     .order('created_at', { ascending: false })
     .limit(limit);
 
-  if (error) {
-    throw error;
-  }
-
-  return (data as TauTransaction[]) ?? [];
+  if (error) throw error;
+  return (data as unknown as TauTransaction[]) ?? [];
 }
 
-// Llama a la RPC create_transaction (en Supabase) que ya hace 20/30/50
 export async function createTauTransaction(
-  type: TauTransactionType,
+  toUserId: string,
   amount: number,
-  metadata: Record<string, unknown> = {},
+  transactionType: string,
+  description?: string,
 ) {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) throw new Error('Not authenticated');
+
   const { data, error } = await supabase.rpc('create_transaction', {
-    p_type: type,
+    p_from_user_id: user.id,
+    p_to_user_id: toUserId,
     p_amount: amount,
-    p_metadata: metadata,
+    p_transaction_type: transactionType,
+    p_description: description,
   });
 
-  if (error) {
-    throw error;
-  }
-
+  if (error) throw error;
   return data;
 }
 
-// Reclamar recompensa de misión (RPC claim_mission_reward)
 export async function claimMissionReward(missionId: string) {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) throw new Error('Not authenticated');
+
   const { data, error } = await supabase.rpc('claim_mission_reward', {
     p_mission_id: missionId,
+    p_user_id: user.id,
   });
 
-  if (error) {
-    throw error;
-  }
-
+  if (error) throw error;
   return data;
 }
 
@@ -107,12 +120,9 @@ export async function getActiveMissions(): Promise<TauMission[]> {
   const { data, error } = await supabase
     .from('missions')
     .select('*')
-    .eq('status', 'ACTIVE')
+    .eq('is_active', true)
     .order('created_at', { ascending: true });
 
-  if (error) {
-    throw error;
-  }
-
-  return (data as TauMission[]) ?? [];
+  if (error) throw error;
+  return (data as unknown as TauMission[]) ?? [];
 }

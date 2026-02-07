@@ -1,6 +1,6 @@
 // src/msr/msr.threat.eoct.adapter.ts
 
-import { MSRThreatContext } from "./msr.threat.types";
+import { MSRThreatContext, MSRThreatLevel } from "./msr.threat.types";
 
 export type EOCTChannel = "console" | "webhook" | "pager" | "chat";
 
@@ -8,35 +8,47 @@ export interface EOCTNotificationResult {
   ok: boolean;
   channel: EOCTChannel;
   error?: string;
+  notifiedAt: number;
 }
 
+/**
+ * Firma minimal del EOCT real.
+ * Implementaciones concretas (Slack, PagerDuty, panel XR, etc.)
+ * viven en otra capa.
+ */
 export interface EOCTNotifier {
   notify(
     context: MSRThreatContext,
+    channel: EOCTChannel,
   ): Promise<EOCTNotificationResult>;
 }
 
 /**
- * Configuración de políticas de escalamiento EOCT
+ * Políticas de escalamiento EOCT.
  */
 export interface MSRThreatEOCTConfig {
-  minIntervalMs: number;          // anti‑spam entre notificaciones
-  requireExistentialForPager: boolean;
+  minIntervalMs: number;          // anti‑spam
+  highLevelChannels: EOCTChannel[];       // para "high"
+  existentialLevelChannels: EOCTChannel[]; // para "existential"
+  alwaysNotifyOnExistential: boolean;
+  logFailedAttempts: boolean;
 }
 
 const DEFAULT_CONFIG: MSRThreatEOCTConfig = {
-  minIntervalMs: 60_000,          // mínimo 60s entre avisos
-  requireExistentialForPager: true,
+  minIntervalMs: 60_000,
+  highLevelChannels: ["webhook"],
+  existentialLevelChannels: ["pager", "webhook"],
+  alwaysNotifyOnExistential: true,
+  logFailedAttempts: true,
 };
 
 /**
- * Adaptador EOCT:
- * - Decide CUÁNDO escalar.
- * - Asegura que no se sature EOCT.
- * - Marca acknowledgements y fases del incidente.
+ * Adaptador EOCT: convierte un MSRThreatContext en una
+ * llamada disciplinada al centro de operaciones.
  */
 export class MSRThreatEOCTAdapter {
   private lastNotificationTs: number | null = null;
+  private lastNotificationLevel: MSRThreatLevel | null = null;
   private readonly config: MSRThreatEOCTConfig;
 
   constructor(
@@ -47,38 +59,72 @@ export class MSRThreatEOCTAdapter {
   }
 
   /**
-   * Intenta escalar al EOCT según el contexto.
-   * No hace nada si no hace falta escalar o si se violan ventanas anti‑spam.
+   * Intenta escalar según contexto y políticas.
+   * Devuelve el resultado del último canal probado o null si no se notificó.
    */
-  async escalate(context: MSRThreatContext): Promise<EOCTNotificationResult | null> {
-    if (!context.escalationRequired) {
+  async escalate(
+    context: MSRThreatContext,
+  ): Promise<EOCTNotificationResult | null> {
+    if (!context.escalationRequired && !this.shouldForceByLevel(context)) {
       return null;
     }
 
     const now = Date.now();
+
+    // Anti‑spam / deduplicación básica
     if (
       this.lastNotificationTs &&
-      now - this.lastNotificationTs < this.config.minIntervalMs
+      now - this.lastNotificationTs < this.config.minIntervalMs &&
+      this.lastNotificationLevel === context.currentLevel
     ) {
-      // Anti‑spam: ya se notificó hace muy poco
       return null;
     }
 
-    // Elegir canal lógico según severidad
-    const channel: EOCTChannel =
-      context.currentLevel === "existential" ||
-      (context.currentLevel === "high" &&
-        !this.config.requireExistentialForPager)
-        ? "pager"
-        : "webhook";
+    const channels = this.chooseChannels(context.currentLevel);
+    let lastResult: EOCTNotificationResult | null = null;
 
-    const result = await this.eoct.notify(context);
+    for (const ch of channels) {
+      try {
+        const res = await this.eoct.notify(context, ch);
+        lastResult = res;
 
-    if (result.ok) {
-      this.lastNotificationTs = now;
-      context.eoctNotified = true;
+        if (res.ok) {
+          this.lastNotificationTs = res.notifiedAt;
+          this.lastNotificationLevel = context.currentLevel;
+          context.eoctNotified = true;
+          break; // con un canal exitoso basta
+        }
+      } catch (err) {
+        if (!this.config.logFailedAttempts) continue;
+        // Aquí podrías anclar en BookPI/MSR con otro adaptador
+        // por ahora sólo seguimos al siguiente canal
+        lastResult = {
+          ok: false,
+          channel: ch,
+          error: err instanceof Error ? err.message : "unknown",
+          notifiedAt: Date.now(),
+        };
+      }
     }
 
-    return { ...result, channel };
+    return lastResult;
+  }
+
+  private chooseChannels(level: MSRThreatLevel): EOCTChannel[] {
+    if (level === "existential") {
+      return this.config.existentialLevelChannels;
+    }
+    if (level === "high") {
+      return this.config.highLevelChannels;
+    }
+    // Para niveles menores podrías usar sólo consola / logs
+    return ["console"];
+  }
+
+  private shouldForceByLevel(ctx: MSRThreatContext): boolean {
+    return (
+      this.config.alwaysNotifyOnExistential &&
+      ctx.currentLevel === "existential"
+    );
   }
 }

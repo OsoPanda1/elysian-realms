@@ -6,34 +6,33 @@ import { BookPI } from "@/core/bookpi";
 
 /**
  * BOOTSTRAP SOBERANO DE LA CONSTITUCIÓN TAMV
- *
- * - Genera la Constitución
- * - (Opcional) la pasa por meta-cognición
- * - La ancla en BookPI
- * - La registra como candidata MSR
- *
- * ⚠️ Este archivo NO debe importarse desde UI ni desde cognition.
- * Se ejecuta solo en contexto controlado.
  */
 export async function bootstrapTAMVConstitution() {
-  // 1️⃣ Inicializar BookPI (memoria ética)
   const bookpi = new BookPI();
 
-  // 2️⃣ Generación automática de la Constitución
-  const constitution = ConstitutionEngine.generate();
+  const engine = new ConstitutionEngine({
+    id: "tamv-constitution",
+    version: "v1.0.0",
+    signer: "tamv-foundation",
+  });
 
-  // 3️⃣ (v2) Meta-cognición podría validar aquí
-  // metaGovernor.evaluateConstitution(constitution)
+  const constitution = engine.getSnapshot();
 
-  // 4️⃣ Publicación soberana
+  if (!engine.verifyIntegrity()) {
+    throw new Error("Constitución TAMV corrupta o manipulada.");
+  }
+
   const publisher = new ConstitutionPublisher(bookpi);
-  const result = await publisher.publish(constitution);
+  await publisher.publish({
+    constitution,
+    kind: "initial",
+    actorId: "bootstrap",
+    reason: "Arranque inicial del kernel TAMV.",
+  });
 
   return {
     constitutionId: constitution.id,
     version: constitution.version,
     hash: constitution.hash,
-    bookpi: result.anchored,
-    msrCandidate: result.ledgerCandidate,
   };
 }

@@ -67,7 +67,7 @@ export class ProtocolToMSRAdapter {
    */
   recordState(
     context: ProtocolContext,
-  ): MSRAppendResult & { protocolId: ProtocolId; state: ProtocolState } {
+  ): MSRAppendResult & { protocolId: ProtocolId; protocolState: ProtocolState } {
     const payload: MSRBlockPayload = {
       domain: this.mapDomain(context.id),
       type: "protocol_state_change",
@@ -102,7 +102,7 @@ export class ProtocolToMSRAdapter {
     return {
       ...result,
       protocolId: context.id,
-      state: context.state,
+      protocolState: context.state,
     };
   }
 

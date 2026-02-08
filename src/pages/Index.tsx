@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Navigation } from "@/components/layout/Navigation";
 import { VRWorld } from "@/components/3d/VRWorld";
-import { WorldHUD } from "@/components/world/WorldHUD";
+import { WorldHUD } from "@/components/3d/world/WorldHUD";
 
 const INTRO_DURATION = 6500; // 6.5s ritual
 

@@ -38,6 +38,8 @@ export type ProtocolIrreversibility =
   | "hard";
 
 export type ProtocolThreatLevel =
+  | "low"
+  | "medium"
   | "high"
   | "existential";
 
@@ -48,7 +50,8 @@ export type ProtocolImpactDomain =
   | "identity"
   | "governance"
   | "xr"
-  | "global";
+  | "global"
+  | "human_life";
 
 export interface ProtocolApproval {
   approverId: string;
@@ -125,6 +128,7 @@ export interface ProtocolDecision {
 
   ethicalCost?: number;
   legitimacyAtDecision?: number;
+  relatedMSRBlockIndex?: number;
 }
 
 // ─────────────────────────────
@@ -200,6 +204,8 @@ export const ProtocolIrreversibilitySchema = z.enum([
 ]);
 
 export const ProtocolThreatLevelSchema = z.enum([
+  "low",
+  "medium",
   "high",
   "existential",
 ]);
@@ -212,6 +218,7 @@ export const ProtocolImpactDomainSchema = z.enum([
   "governance",
   "xr",
   "global",
+  "human_life",
 ]);
 
 export const ProtocolActivationModeSchema = z.enum([

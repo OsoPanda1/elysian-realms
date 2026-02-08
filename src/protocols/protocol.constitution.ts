@@ -65,8 +65,10 @@ export const PROTOCOL_RULES: Record<ProtocolId, ProtocolConstitutionRule> = {
 // ───────────────────────────────────────────
 
 const THREAT_WEIGHT: Record<ProtocolThreatLevel, number> = {
-  high: 1,
-  existential: 2,
+  low: 0,
+  medium: 1,
+  high: 2,
+  existential: 3,
 };
 
 function threatGte(a: ProtocolThreatLevel, b: ProtocolThreatLevel): boolean {

@@ -1,3 +1,8 @@
+/**
+ * Tipos constitucionales de TAMV.
+ * Define la estructura del documento constitucional y sus reglas.
+ */
+
 export type ConstitutionalLevel =
   | "absolute"     // nunca puede violarse
   | "critical"     // solo con EOCT + MSR
@@ -5,24 +10,57 @@ export type ConstitutionalLevel =
 
 export interface ConstitutionalRule {
   id: string;
-  level: ConstitutionalLevel;
+  level?: ConstitutionalLevel;
   description: string;
 
-  // evaluación pura (sin side effects)
-  evaluate(input: {
-    state: any;
-    intent: any;
-  }): boolean;
+  // Acciones explícitamente prohibidas
+  forbids?: string[];
+  // Targets prohibidos (ej. "user_harm")
+  forbidsTargets?: string[];
+
+  // Urgencia
+  maxUrgency?: number;
+  minUrgency?: number;
+
+  // Requerimientos
+  requiresEOCT?: boolean;
+  requiresProtocol?: string[];
+
+  // Evaluación pura (sin side effects) — legacy
+  evaluate?: (input: { state: any; intent: any }) => boolean;
 }
 
-export interface TAMVConstitution {
+export interface ConstitutionArticle {
+  id: string;
+  title: string;
+  domain: string;
+  rules: ConstitutionalRule[];
+}
+
+export interface Constitution {
   id: string;
   version: string;
   createdAt: number;
-  createdBy: "machine" | "human" | "hybrid";
+  signer: string;
+  articles: ConstitutionArticle[];
+  hash: string;
+  signature?: string;
+}
 
-  principles: string[];
-  rules: ConstitutionalRule[];
+/** Alias legacy */
+export type TAMVConstitution = Constitution;
 
-  hash: string; // para MSR
+export interface ConstitutionalViolation {
+  ruleId: string;
+  allowed: boolean;
+  requiresEOCT: boolean;
+  reason: string;
+  requiresProtocol?: string[];
+}
+
+export interface ConstitutionalVerdict {
+  allowed: boolean;
+  requiresEOCT: boolean;
+  reason: string;
+  violations: ConstitutionalViolation[];
 }

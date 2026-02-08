@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { ArrowRight, Play, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { CosmicScene } from '@/components/3d/CosmicScene';
+import { CosmicCore as CosmicScene } from '@/components/3d/CosmicScene';
 
 export function HeroSection() {
   return (
